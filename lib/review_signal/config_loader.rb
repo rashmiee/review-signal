@@ -26,7 +26,7 @@ module ReviewSignal
       return base unless config_path
 
       override = action_mode? ? load_remote_config : load_filesystem_config
-      Rules::Engine.merge(base, override)
+      ReviewSignal::Rules::Engine.merge(base, override)
     rescue StandardError => error
       return base if not_found?(error)
 
@@ -40,7 +40,7 @@ module ReviewSignal
 
       return default_config if preset == "default"
 
-      Rules::Engine.merge(default_config, load_preset_file(preset))
+      ReviewSignal::Rules::Engine.merge(default_config, load_preset_file(preset))
     end
 
     def load_preset_file(preset_name)

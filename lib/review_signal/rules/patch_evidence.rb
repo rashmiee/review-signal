@@ -47,7 +47,7 @@ module ReviewSignal
         match = regex.match(added_text)
         return unless match
 
-        line_index = added_text[0...match.begin].count("\n")
+        line_index = added_text[0...match.begin(0)].count("\n")
         snippet_lines = added_lines[line_index, 2] || [match[0].strip]
         truncate(snippet_lines.join(" / "))
       end
