@@ -74,3 +74,69 @@ rules:
     review_focus:
       - "Prefer plain text rendering or a sanitizer."
       - "Confirm untrusted input cannot inject HTML or scripts."
+
+  - id: token_in_query_string
+    when:
+      any_patch: 'admin_token=|\?[a-z_]*token='
+    severity: high
+    message: "Token or secret passed in URL query string. May leak via logs, referrers, or browser history."
+    review_focus:
+      - "Move credentials to headers or request body."
+      - "Confirm proxies and logs do not capture query strings."
+
+  - id: unscoped_find_by_id
+    when:
+      any_path: "app/controllers/**"
+      any_patch: '\.find\(params\[:id\]\)'
+    severity: high
+    message: "Possible IDOR — record loaded by ID without parent scoping."
+    review_focus:
+      - "Scope lookup through the parent resource or current tenant."
+      - "Verify users cannot access records outside their allowed scope."
+
+  - id: validation_todo
+    when:
+      any_patch: '# TODO:.*valid'
+    severity: medium
+    message: "Validation left as TODO in the diff."
+    review_focus:
+      - "Add model or request validation before merge."
+      - "Cover invalid input with specs."
+
+  - id: save_without_error_handling
+    when:
+      any_path: "app/controllers/**"
+      any_patch: '\.save\s*\n[^\n]*render json'
+    severity: medium
+    message: "Controller may render success even when save fails."
+    review_focus:
+      - "Branch on save result and return appropriate status codes."
+      - "Return validation errors to the client."
+
+  - id: placeholder_task_id
+    when:
+      any_patch: '/tasks/0/|/tasks/0\?'
+    severity: medium
+    message: "Placeholder task ID used in API path. Likely wrong endpoint shape."
+    review_focus:
+      - "Confirm the route matches the backend contract."
+      - "Avoid hard-coded sentinel IDs in client requests."
+
+  - id: possible_n_plus_one
+    when:
+      any_path: "app/controllers/**"
+      any_patch: '\.map \{[\s\S]{0,400}?\.(task|user|account)\.'
+    severity: medium
+    message: "Possible N+1 query — association accessed inside a loop or map."
+    review_focus:
+      - "Eager load with includes/preload."
+      - "Verify index endpoints do not query per row."
+
+  - id: sensitive_logging
+    when:
+      any_patch: 'params\.inspect|Rails\.logger\.(info|debug).*params'
+    severity: high
+    message: "Request params may be logged. Risk of leaking tokens or PII."
+    review_focus:
+      - "Log only safe identifiers."
+      - "Redact secrets and personal data from logs."

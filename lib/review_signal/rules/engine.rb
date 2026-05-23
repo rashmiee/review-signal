@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 require "yaml"
+require_relative "patch_evidence"
 
 module ReviewSignal
   module Rules
-    RiskFlag = Struct.new(:id, :severity, :message, :review_focus, keyword_init: true)
+    RiskFlag = Struct.new(:id, :severity, :message, :review_focus, :evidence, keyword_init: true)
 
     class Engine
       attr_reader :config
@@ -27,13 +28,15 @@ module ReviewSignal
 
       def flags_for(files, patches: {})
         rules.filter_map do |rule|
-          next unless matches?(rule, files, patches)
+          evidence = collect_evidence(rule, files, patches)
+          next if evidence.empty?
 
           RiskFlag.new(
             id: rule.fetch("id"),
             severity: rule.fetch("severity", "medium"),
             message: rule.fetch("message"),
-            review_focus: Array(rule["review_focus"])
+            review_focus: Array(rule["review_focus"]),
+            evidence: evidence
           )
         end
       end
@@ -44,30 +47,27 @@ module ReviewSignal
         Array(config.fetch("rules", []))
       end
 
-      def matches?(rule, files, patches)
+      def collect_evidence(rule, files, patches)
         condition = rule.fetch("when", {})
         any_path = condition["any_path"]
         any_patch = condition["any_patch"]
-        return false if any_path.nil? && any_patch.nil?
+        return [] if any_path.nil? && any_patch.nil?
 
-        path_condition_met?(any_path, files) && patch_condition_met?(any_patch, patches)
-      end
+        path_matches = matching_paths(any_path, files)
+        return [] if any_path && path_matches.empty?
 
-      def path_condition_met?(any_path, files)
-        return true unless any_path
-
-        patterns = Array(any_path)
-        files.any? do |path|
-          patterns.any? { |pattern| glob_match?(pattern, path) }
+        if any_patch
+          limit = any_path ? path_matches : nil
+          return PatchEvidence.from_patches(any_patch, patches, limit_to_files: limit)
         end
+
+        PatchEvidence.from_paths(path_matches)
       end
 
-      def patch_condition_met?(any_patch, patches)
-        return true unless any_patch
-
-        patterns = Array(any_patch)
-        patches.values.compact.any? do |patch|
-          patterns.any? { |pattern| Regexp.new(pattern).match?(patch) }
+      def matching_paths(any_path, files)
+        patterns = Array(any_path)
+        files.select do |path|
+          patterns.any? { |pattern| glob_match?(pattern, path) }
         end
       end
 
@@ -81,4 +81,3 @@ module ReviewSignal
     end
   end
 end
-

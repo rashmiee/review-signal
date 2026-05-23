@@ -75,9 +75,27 @@ module ReviewSignal
       def risk_flag_lines
         return ["- No path-based risk flags detected."] if risk_flags.empty?
 
-        risk_flags.map do |flag|
-          "- [#{SEVERITY_LABELS.fetch(flag.severity.to_s, flag.severity.to_s.upcase)}] #{flag.message}"
+        risk_flags.flat_map do |flag|
+          lines = ["- [#{severity_label(flag)}] #{flag.message}"]
+          lines.concat(evidence_lines(flag.evidence))
+          lines
         end
+      end
+
+      def evidence_lines(evidence)
+        return [] if evidence.nil? || evidence.empty?
+
+        evidence.map do |item|
+          if item.snippet.nil? || item.snippet.empty?
+            "  - `#{item.path}`"
+          else
+            "  - `#{item.path}` — `#{item.snippet}`"
+          end
+        end
+      end
+
+      def severity_label(flag)
+        SEVERITY_LABELS.fetch(flag.severity.to_s, flag.severity.to_s.upcase)
       end
 
       def review_focus_lines

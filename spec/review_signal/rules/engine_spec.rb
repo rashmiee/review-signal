@@ -49,11 +49,13 @@ RSpec.describe ReviewSignal::Rules::Engine do
     flags = described_class.new(config).flags_for(
       ["app/controllers/api/v1/task_assignees_controller.rb"],
       patches: {
-        "app/controllers/api/v1/task_assignees_controller.rb" => "+      ADMIN_TOKEN = \"secret\""
+        "app/controllers/api/v1/task_assignees_controller.rb" => "+      ADMIN_TOKEN = \"secret\"\n"
       }
     )
 
     expect(flags.map(&:id)).to eq(["hardcoded_secret"])
+    expect(flags.first.evidence.first.path).to eq("app/controllers/api/v1/task_assignees_controller.rb")
+    expect(flags.first.evidence.first.snippet).to include("ADMIN_TOKEN")
   end
 end
 
