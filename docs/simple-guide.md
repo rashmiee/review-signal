@@ -1,4 +1,4 @@
-# Review Signal — Intern Guide
+# Review Signal — Guide
 
 This guide explains what Review Signal is, how it works, and how to work on it. It is written for someone new to the project.
 
