@@ -1,0 +1,31 @@
+rules:
+  - id: migration
+    when:
+      any_path: "db/migrate/**"
+    severity: high
+    message: "Schema change detected. Verify migration safety, rollback, and data backfill."
+    review_focus:
+      - "Confirm rollback path."
+      - "Check for NOT NULL columns without a backfill."
+
+  - id: auth_surface
+    when:
+      any_path:
+        - "app/policies/**"
+        - "app/models/ability/**"
+        - "config/roles.yml"
+    severity: high
+    message: "Authorization surface changed. Verify allowed and denied paths."
+    review_focus:
+      - "Confirm unauthorized cases are covered."
+      - "Check that permissions are scoped to the intended actor."
+
+  - id: background_job
+    when:
+      any_path: "app/jobs/**"
+    severity: medium
+    message: "Background job changed. Verify retries, idempotency, and queue behavior."
+    review_focus:
+      - "Confirm repeated execution is safe."
+      - "Check failure and retry behavior."
+

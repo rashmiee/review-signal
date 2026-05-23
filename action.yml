@@ -1,0 +1,34 @@
+name: Review Signal
+description: Post a deterministic PR review brief comment
+inputs:
+  github-token:
+    description: GitHub token with PR comment permissions
+    required: false
+    default: ${{ github.token }}
+  config-path:
+    description: Repo-relative rules YAML fetched through the Contents API from the PR base ref
+    required: false
+  preset:
+    description: Built-in preset: default or rails
+    required: false
+    default: rails
+runs:
+  using: composite
+  steps:
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "3.3"
+        bundler-cache: true
+        working-directory: ${{ github.action_path }}
+
+    - run: bundle exec bin/review-signal
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        REVIEW_SIGNAL_MODE: action
+        REVIEW_SIGNAL_PRESET: ${{ inputs.preset }}
+        REVIEW_SIGNAL_CONFIG: ${{ inputs.config-path }}
+

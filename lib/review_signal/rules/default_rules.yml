@@ -1,0 +1,23 @@
+rules:
+  - id: dependency_manifest
+    when:
+      any_path:
+        - Gemfile
+        - Gemfile.lock
+        - package.json
+        - yarn.lock
+    severity: medium
+    message: "Dependency surface changed. Verify lockfile intent and dependency trust."
+    review_focus:
+      - "Confirm dependency updates are intentional."
+      - "Check whether lockfile changes match manifest changes."
+
+  - id: github_workflow
+    when:
+      any_path: ".github/**"
+    severity: medium
+    message: "GitHub workflow or repository automation changed. Verify permissions and trigger safety."
+    review_focus:
+      - "Confirm workflow permissions follow least privilege."
+      - "Check pull_request_target usage carefully."
+

@@ -1,0 +1,23 @@
+name: Review Signal Demo
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  brief:
+    runs-on: ubuntu-latest
+    steps:
+      # After publishing v0.1.0, replace your-org with the owner of this repo.
+      # Keep this workflow on pull_request for dogfooding. Do not add checkout of
+      # untrusted PR code to a pull_request_target variant.
+      - uses: your-org/review-signal@v0.1.0
+        with:
+          preset: rails
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+

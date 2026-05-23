@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "review_signal"
+require "review_signal/cli"
+
+exit ReviewSignal::Cli.call
+
