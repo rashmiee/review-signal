@@ -25,11 +25,11 @@ module ReviewSignal
     end
 
     def update_issue_comment(repo, comment_id, body)
-      api.update_issue_comment(repo, comment_id, body)
+      api.update_comment(repo, comment_id, body)
     end
 
     def create_issue_comment(repo, pr_number, body)
-      api.create_issue_comment(repo, pr_number, body)
+      api.add_comment(repo, pr_number, body)
     end
 
     private
