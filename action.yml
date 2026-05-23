@@ -9,7 +9,7 @@ inputs:
     description: Repo-relative rules YAML fetched through the Contents API from the PR base ref
     required: false
   preset:
-    description: Built-in preset: default or rails
+    description: "Built-in preset: default or rails"
     required: false
     default: rails
 runs:
