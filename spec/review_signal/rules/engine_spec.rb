@@ -33,5 +33,27 @@ RSpec.describe ReviewSignal::Rules::Engine do
       include("id" => "billing")
     )
   end
+
+  it "emits flags for matching patch content" do
+    config = {
+      "rules" => [
+        {
+          "id" => "hardcoded_secret",
+          "when" => { "any_patch" => "ADMIN_TOKEN" },
+          "severity" => "critical",
+          "message" => "Possible hardcoded secret detected in the diff."
+        }
+      ]
+    }
+
+    flags = described_class.new(config).flags_for(
+      ["app/controllers/api/v1/task_assignees_controller.rb"],
+      patches: {
+        "app/controllers/api/v1/task_assignees_controller.rb" => "+      ADMIN_TOKEN = \"secret\""
+      }
+    )
+
+    expect(flags.map(&:id)).to eq(["hardcoded_secret"])
+  end
 end
 

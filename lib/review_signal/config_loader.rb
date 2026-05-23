@@ -36,8 +36,16 @@ module ReviewSignal
     private
 
     def load_preset
-      relative_path = PRESET_FILES.fetch(preset) do
-        raise ArgumentError, "Unknown preset: #{preset}"
+      default_config = load_preset_file("default")
+
+      return default_config if preset == "default"
+
+      Rules::Engine.merge(default_config, load_preset_file(preset))
+    end
+
+    def load_preset_file(preset_name)
+      relative_path = PRESET_FILES.fetch(preset_name) do
+        raise ArgumentError, "Unknown preset file: #{preset_name}"
       end
 
       load_yaml(File.read(File.expand_path(relative_path, __dir__)))

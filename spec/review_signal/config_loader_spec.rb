@@ -4,10 +4,11 @@ require "spec_helper"
 require "tempfile"
 
 RSpec.describe ReviewSignal::ConfigLoader do
-  it "loads the built-in Rails preset" do
+  it "loads the built-in Rails preset merged with default rules" do
     config = described_class.new(preset: "rails").load
+    rule_ids = config.fetch("rules").map { |rule| rule.fetch("id") }
 
-    expect(config.fetch("rules").map { |rule| rule.fetch("id") }).to include("migration", "auth_surface")
+    expect(rule_ids).to include("migration", "auth_surface", "api_controller", "dependency_manifest")
   end
 
   it "merges local filesystem overrides in CLI mode" do

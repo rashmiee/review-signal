@@ -12,7 +12,7 @@ module ReviewSignal
         jobs: ["app/jobs/**", "engines/**/app/jobs/**"],
         policies: ["app/policies/**", "app/models/ability/**", "config/roles.yml"],
         graphql: ["app/graphql/**"],
-        client: ["client/**", "app/javascript/**"],
+        client: ["client/**", "frontend/**", "app/javascript/**"],
         specs: ["spec/**", "test/**", "features/**", "client/tests/**"],
         config: ["config/**", ".github/**", "Gemfile", "Gemfile.lock", "*.gemspec", "package.json", "yarn.lock"]
       }.freeze

@@ -27,7 +27,13 @@ module ReviewSignal
 
       client = Client.new(token: token)
       pull_request = client.pull_request(repo, pr_number)
-      files = client.pull_request_files(repo, pr_number).map { |file| value_from(file, :filename) }
+      file_entries = client.pull_request_files(repo, pr_number)
+      files = file_entries.map { |file| value_from(file, :filename) }
+      patches = file_entries.each_with_object({}) do |file, memo|
+        filename = value_from(file, :filename)
+        patch = value_from(file, :patch)
+        memo[filename] = patch if filename && patch
+      end
       context = PullRequestContext.new(
         repo: repo,
         number: pr_number,
@@ -47,7 +53,7 @@ module ReviewSignal
       ).load
 
       area_summary = Analyzers::AreaClassifier.new(files).summary
-      risk_flags = Rules::Engine.new(config).flags_for(files)
+      risk_flags = Rules::Engine.new(config).flags_for(files, patches: patches)
       test_signal = Analyzers::TestSignal.new(files)
       markdown = Render::MarkdownBrief.new(
         context: context,

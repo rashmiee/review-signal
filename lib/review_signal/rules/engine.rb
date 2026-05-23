@@ -25,9 +25,9 @@ module ReviewSignal
         @config = config
       end
 
-      def flags_for(files)
+      def flags_for(files, patches: {})
         rules.filter_map do |rule|
-          next unless matches?(rule, files)
+          next unless matches?(rule, files, patches)
 
           RiskFlag.new(
             id: rule.fetch("id"),
@@ -44,14 +44,30 @@ module ReviewSignal
         Array(config.fetch("rules", []))
       end
 
-      def matches?(rule, files)
+      def matches?(rule, files, patches)
         condition = rule.fetch("when", {})
         any_path = condition["any_path"]
-        return false unless any_path
+        any_patch = condition["any_patch"]
+        return false if any_path.nil? && any_patch.nil?
+
+        path_condition_met?(any_path, files) && patch_condition_met?(any_patch, patches)
+      end
+
+      def path_condition_met?(any_path, files)
+        return true unless any_path
 
         patterns = Array(any_path)
         files.any? do |path|
           patterns.any? { |pattern| glob_match?(pattern, path) }
+        end
+      end
+
+      def patch_condition_met?(any_patch, patches)
+        return true unless any_patch
+
+        patterns = Array(any_patch)
+        patches.values.compact.any? do |patch|
+          patterns.any? { |pattern| Regexp.new(pattern).match?(patch) }
         end
       end
 

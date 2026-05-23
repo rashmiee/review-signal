@@ -8,6 +8,16 @@ rules:
       - "Confirm rollback path."
       - "Check for NOT NULL columns without a backfill."
 
+  - id: api_controller
+    when:
+      any_path: "app/controllers/api/**"
+    severity: high
+    message: "API controller changed. Verify authentication, authorization, and input validation."
+    review_focus:
+      - "Confirm endpoints require authentication."
+      - "Check strong params and tenant scoping."
+      - "Verify unauthorized access is rejected."
+
   - id: auth_surface
     when:
       any_path:
@@ -29,3 +39,38 @@ rules:
       - "Confirm repeated execution is safe."
       - "Check failure and retry behavior."
 
+  - id: hardcoded_secret
+    when:
+      any_patch: '(ADMIN_TOKEN|SECRET|API_KEY|password\s*=\s*[''"])'
+    severity: critical
+    message: "Possible hardcoded secret detected in the diff."
+    review_focus:
+      - "Move secrets to credentials or environment variables."
+      - "Confirm no tokens are logged or exposed to the client."
+
+  - id: sql_interpolation
+    when:
+      any_patch: 'LIKE ''%#\{|where\(["''].*#\{|Arel\.sql\(.*#\{'
+    severity: critical
+    message: "Possible SQL interpolation detected. Verify query is parameterized."
+    review_focus:
+      - "Replace string interpolation with bound parameters."
+      - "Confirm user input cannot alter query structure."
+
+  - id: unsafe_mass_assignment
+    when:
+      any_patch: '\.build\(params\[:|\.create\(params\[:|\.update\(params\[:'
+    severity: high
+    message: "Possible unsafe mass assignment from params."
+    review_focus:
+      - "Use strong parameters or explicit permitted attributes."
+      - "Confirm nested params cannot set protected fields."
+
+  - id: xss_surface
+    when:
+      any_patch: 'dangerouslySetInnerHTML'
+    severity: high
+    message: "Possible XSS surface via dangerouslySetInnerHTML."
+    review_focus:
+      - "Prefer plain text rendering or a sanitizer."
+      - "Confirm untrusted input cannot inject HTML or scripts."
