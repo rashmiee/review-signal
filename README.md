@@ -53,7 +53,7 @@ jobs:
   brief:
     runs-on: ubuntu-latest
     steps:
-      - uses: your-org/review-signal@v0.1.0
+      - uses: rashmiee/review-signal@v0.1.0
         with:
           preset: rails
           github-token: ${{ secrets.GITHUB_TOKEN }}

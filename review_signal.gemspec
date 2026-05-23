@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary = "Deterministic PR review briefs for GitHub pull requests."
   spec.description = "Review Signal posts a stable, path-aware review brief comment on GitHub pull requests."
-  spec.homepage = "https://github.com/your-org/review-signal"
+  spec.homepage = "https://github.com/rashmiee/review-signal"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.2"
 
