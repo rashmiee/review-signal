@@ -160,7 +160,4 @@ GITHUB_TOKEN=$(gh auth token) \
 
 ## Support
 
-Support email: replace-with-support-email@example.com
-
-Before registering for the GitHub Developer Program, replace this placeholder
-with the email address where GitHub users can contact you for support.
+Open an issue in this repository.
