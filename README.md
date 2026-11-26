@@ -8,7 +8,7 @@ It is not an AI reviewer and it does not execute code from the pull request.
 
 ## Documentation
 
-- [Intern guide](docs/intern-guide.md) — what Review Signal is, how it works, and how to extend it
+- [Guide](docs/simple-guide.md) - what Review Signal is, how it works, and how to extend it
 
 ## Example Output
 
